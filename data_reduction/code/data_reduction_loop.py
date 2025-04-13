@@ -44,7 +44,7 @@ if __name__ == "__main__":
         "R" : [10, 4],
         }
     
-    path = "C:/Users/buzzs/OneDrive/Documents/Physics/Astro 230/Final_Project/data/"
+    path = "C:/Users/buzzs/OneDrive/Documents/Physics/Astro 230/Final_Project/data_reduction/"
     inpath = path + "raw/"
     outpath = path + "reduced/"
     calpath = path + "calibration/"
