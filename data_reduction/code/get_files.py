@@ -50,7 +50,8 @@ def fits_get(path, selected_band = "Not Specified", selected_exptime = "Not Spec
             file_exptime = str(int(file_hdr['EXPTIME']))
         else:
             file_exptime = "Not Specified"
-            
+        
+        #this is just like the original filename
         file_number = os.path.basename(file).split('_')[0]
         
         if file_exptime == selected_exptime and file_band == selected_band:

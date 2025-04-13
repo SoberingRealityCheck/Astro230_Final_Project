@@ -163,8 +163,7 @@ if __name__ == "__main__":
     test_flats = glob.glob(path + 'data/calibration/flats/*.fit')
     test_darks = glob.glob(path + 'data/calibration/darks/*.fit')
 
-    #McDonald 30inch telecope data ranges
-
+    #McDonald 30inch telecope data ranges I use to trim off the bias strip and stuff
     test_ranges = {
         '''
         'x1' : 3,     # first good pixel in x after trim
@@ -177,20 +176,25 @@ if __name__ == "__main__":
     }
 
 
-
     DEBUG = False
     # Set to True to see debug information and plots
+    
     DARKS = True
+    # Set to True to use dark frames in the reduction process
+    
     CROP_DATA = False
+    # Set to True to crop the data to the specified ranges
 
+    
     ndata, nheader = reduce_image(test_ffile, test_biases, test_flats, test_darks, test_ranges, debug=DEBUG, use_darks = DARKS, crop_data = CROP_DATA)
     if DEBUG:
         plt.imshow(ndata, origin='lower', vmin=1500, vmax=5500)
         plt.colorbar()
         plt.show()
 
-
-
-    # If you want to save the image as a new file, uncomment the line below
-    fits.writeto(path+"data/reduced/mars_1.fits", data=ndata, header=nheader, overwrite=True)
+    
+    # If you want to save the image as a new file, uncomment the lines below
+    
+    #filename = "mars_1.fits"
+    #fits.writeto(path+"data/reduced/"+filename, data=ndata, header=nheader, overwrite=True)
 
