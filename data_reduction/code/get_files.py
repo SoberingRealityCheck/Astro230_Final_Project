@@ -65,8 +65,9 @@ def fits_get(path, selected_band = "Not Specified", selected_exptime = "Not Spec
 
 if __name__ == "__main__":
     # Example usage from my personal computer. This will not work on your computer :)
-    path = "C:/Users/buzzs/OneDrive/Documents/Physics/Astro 230/Final_Project/data/raw/"
+    from config import path
+    raw_path = path + "raw/"
     band = "R"
     exptime = "10"
     
-    matching_files = fits_get(path, selected_band = band, selected_exptime = exptime)
+    matching_files = fits_get(raw_path, selected_band = band, selected_exptime = exptime)

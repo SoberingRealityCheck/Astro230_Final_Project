@@ -2,6 +2,7 @@ from get_files import fits_get
 from reduce_image import reduce_image
 from astropy.io import fits
 import os
+from config import crop_ranges
 
 def reduce_everything(raw_filepath, reduced_filepath, calibration_filepath, filetypes, darks = False):
     #get our raw data files of the matching bands!
@@ -31,7 +32,7 @@ def reduce_everything(raw_filepath, reduced_filepath, calibration_filepath, file
                 
                 # Open the FITS file and reduce the data
                 fits_data = fits.open(file)
-                ndata, nheader = reduce_image(fits_data, bias_files, flat_files, dark_files, ranges = None, debug = False, use_darks = darks, crop_data = False)
+                ndata, nheader = reduce_image(fits_data, bias_files, flat_files, dark_files, ranges = crop_ranges, debug = False, use_darks = darks, crop_data = True)
                 
                 # Add a new header entry to indicate that the data has been reduced
                 nheader.append(('REDUCED', True, 'Data has been reduced'))
@@ -53,16 +54,12 @@ def reduce_everything(raw_filepath, reduced_filepath, calibration_filepath, file
 if __name__ == "__main__":
     # the filetypes dictionary is formatted as bands as keys 
     # and a list of related exposure times as an array of values.
-    filetypes = {
-        "B" : [20, 60],
-        "V" : [20, 7, 3],
-        "R" : [10, 4],
-        }
+    from config import filetypes 
     
     # Set the paths for the raw, reduced, and calibration data. 
     # Change these paths to your own directory structure.
-    path = "C:/Users/buzzs/OneDrive/Documents/Physics/Astro 230/Final_Project/data_reduction/"
-    
+    from config import path
+
     # This is where the raw data is stored.
     inpath = path + "raw/"
     

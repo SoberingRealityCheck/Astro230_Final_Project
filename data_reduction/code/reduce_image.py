@@ -163,17 +163,6 @@ if __name__ == "__main__":
     test_flats = glob.glob(path + 'data/calibration/flats/*.fit')
     test_darks = glob.glob(path + 'data/calibration/darks/*.fit')
 
-    #McDonald 30inch telecope data ranges I use to trim off the bias strip and stuff.
-    test_ranges = {
-        'x1' : 3,     # first good pixel in x after trim
-        'x2' : 1020,  # last pixel to include in x after trim
-        'y1' : 2,     # first good pixel in y after trim
-        'y2' : 1020,  # last pixel to include in y after trim
-        'bx1' : 1025, # first pixel of bias section
-        'bx2' : 1054, # last pixel of bias section}
-    }
-
-
     DEBUG = False
     # Set to True to see debug information and plots
     
@@ -183,6 +172,7 @@ if __name__ == "__main__":
     CROP_DATA = False
     # Set to True to crop the data to the specified ranges
 
+    from config import test_ranges
     
     ndata, nheader = reduce_image(test_ffile, test_biases, test_flats, test_darks, test_ranges, debug=DEBUG, use_darks = DARKS, crop_data = CROP_DATA)
     if DEBUG:
