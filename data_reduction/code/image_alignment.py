@@ -5,7 +5,6 @@ import os
 
 # spacey imports
 from astropy.io import fits
-import astroalign as aa
 from scipy.ndimage import shift
 
 # stuff from other python documents
@@ -17,8 +16,7 @@ from get_files import fits_get
 We will be using the astroalign library. Because I am lazy and don't want to manually do this anymore. 
 # let's test and see how well a pre-written alignment package handles this! lol. 
 
-Update: it does handle it, but I had to fix a typo in the library itself because it was trying to import an old version of the 'sep' library with a different name than the newer one I have installed.
-idk if that's just a clay issue or if other people will encounter it too, but astroalign only imports it once so it was super easy to fix.
+Update: astroalign sucks. Can't get it to work. Just going to match up the brightest pixel in each image, lol.
 '''
 
 def align_and_combine(filepath, output_path):
