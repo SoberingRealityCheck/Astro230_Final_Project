@@ -1,7 +1,8 @@
 Here's the general game plan of how this project will work. Ideally this is all we need to get this thing complete.
 
 Step 1: Reduce the data. This is simple, done it a million times, easy peasy. 
-Will end up with six(?) separate images (Long/Short exposures in the B, V, R bands). 
+Will end up with 6 or 7 separate images (Long/Medium/Short exposures in the B, V, R bands). 
+DONE!!! easy peasy
 
 Step 2: Identify Star pixel positions in the data. 
 Will have a big numpy array with star ID, pixel x-y coords.
