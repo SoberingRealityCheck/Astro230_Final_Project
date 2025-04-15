@@ -2,7 +2,7 @@
 # This file contains the paths and settings for the data reduction process.
 
 # This is the local path to the directory.
-path = "C:/Users/buzzs/OneDrive/Documents/Physics/Astro 230/Final_Project/data_reduction/"
+path = "C:/Users/buzzs/OneDrive/Documents/Physics/Astro 230/Final_Project/data/"
 
 # This contains info on the types of files I've captured in terms of band types and exposure times (in seconds).
 # The filetypes dictionary is formatted as bands as keys
