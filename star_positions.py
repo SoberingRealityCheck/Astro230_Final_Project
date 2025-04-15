@@ -1,10 +1,16 @@
 #get the actual x-y pixel locations of the stars in the image
+# Core Imports
 import numpy as np
 import matplotlib.pyplot as plt
+
+# AstroPy Imports
 from astropy.io import fits
+from astropy import wcs
+from photutils.detection import DAOStarFinder
+
+# My Imports
 from get_files import fits_get
 from config import path
-from photutils.detection import DAOStarFinder
 
 def get_pixel_positions(files, threshold = 3, plot=False):
     """
@@ -65,7 +71,24 @@ def get_star_locations(star_positions, reference_points, fov):
     
     
     # Step 5: Return a numpy array of RA/Dec locations of stars
-    return []
+    # Set the WCS information manually by setting properties of the WCS
+    # object.
+
+    #drumroll.... 
+    # COPIED AND PASTED DIRECTLY FROM WCS ASTROPY DOCUMENTATION!!! I SEE NO FLAWS IN THIS PLAN 
+    
+    from astropy.utils.data import get_pkg_data_filename
+
+    fn = get_pkg_data_filename(path+'reduced/B_20s_0.fits', package='astropy.wcs.tests')
+
+    f = fits.open(fn)
+
+    w = WCS(f[1].header)
+    skyvals = []
+    for starpos in star_positions:
+        skyvals.append(w.pixel_to_world(starpos))
+    print(skyvals)  # (RA, Dec) in degrees
+    return skyvals
 
 
 if __name__ == "__main__":
@@ -73,6 +96,7 @@ if __name__ == "__main__":
     files = fits_get(path + 'combined/')
     pixel_positions = get_pixel_positions(files, threshold=30, plot=True)
     print("Pixel Positions of Stars:", pixel_positions)
+    skyvals = get_star_locations(pixel_positions, reference_points=[(0, 0)], fov=1.0)
     
     # Save the pixel positions to a numpy file
     np.save(path + '../star_pos_identification/pixel_positions.npy', pixel_positions)
