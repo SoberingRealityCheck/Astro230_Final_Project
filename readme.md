@@ -3,8 +3,9 @@ This is my repository to store all the code and data I have been working with fo
 There is some code in here that may be useful to others who want to be able to quickly search for fits files or do fast data reduction. Hope this is useful to others!
 
 
+<h1>project outline:</h1>
 
-Here's the general game plan of how this project will work. Ideally this is all we need to get this thing complete.
+Here's the general game plan of how this project will work!
 
 **Step 1: Reduce the data.** 
 This is simple, done it a million times, easy peasy. 
