@@ -2,7 +2,7 @@ from get_files import fits_get
 from reduce_image import reduce_image
 from astropy.io import fits
 import os
-from config import crop_ranges
+from code.config import crop_ranges
 
 def reduce_everything(raw_filepath, reduced_filepath, calibration_filepath, filetypes, darks = False):
     #get our raw data files of the matching bands!
