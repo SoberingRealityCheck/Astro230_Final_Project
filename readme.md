@@ -44,6 +44,8 @@ Maybe worth filtering out stars that don't appear in every image? Or at least ev
 Will have a big numpy array with star name, pixel x-y coords, real world RA/Dec coords, Distance/Parallax(?) columns.
 - SIMBAD? Other resources shown in class powerpoint April 10?
 
+THIS IS DONE!!
+got some nice 3d plots too.
 
 **Step 4: Aperture Photometry on each star? Try to find a standard star in the image to calibrate for absolute magnitude.**
 Will be able to add a 'absolute magnitude' in each band to the end of the column, along with color values for B-V and V-R. 
