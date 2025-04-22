@@ -30,7 +30,7 @@ Here's the general game plan of how this project will work!
 
 **Step 1: Reduce the data.** 
 This is simple, done it a million times, easy peasy. 
-Will end up with 6 or 7 separate images (Long/Medium/Short exposures in the B, V, R bands). 
+Will end up with 7 separate images (Long/Medium/Short exposures in the B, V, R bands). 
 
 THIS IS DONE!!! 
 V band images look a little sus - it might be nice to get some more data so I have more than just 2 images at each setting. 
