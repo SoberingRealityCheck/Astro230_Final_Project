@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from config import path
 from astropy.table import Table
+from scipy.stats import norm
 
 #extract the x-y-z locations of the stars from the table from the spherical coordinates given
 def extract_star_positions(table):
@@ -16,10 +17,39 @@ def extract_star_positions(table):
     """
     # Extract the RA, Dec, and Parallax values from the table
     sky = table['sky_coord'].data
-    parallax = table['distance'].data
+    distance = table['distance'].data
     
-    parallax = parallax[1:]  # Skip the first value (assumed to be a header or invalid data)
-    parallax = np.array(parallax, dtype=float)
+    distance = distance[1:]  # Skip the first value (header)
+    distance = np.array(distance, dtype=float)
+    
+    # Crop out the crazy outliers from the data. Stuff that is farther than 10000 parsecs is probably not in our cluster
+    
+    for i in range(len(distance)):
+        if distance[i] > 10000:
+            distance[i] = np.nan
+    
+    # Some fun with getting a gaussian fit to our distance data to see where our cluster probably is
+    mu = np.nanmedian(distance)
+    std = np.nanstd(distance)
+    xp = np.linspace(0, 10000, 100)
+    p = norm.pdf(xp, mu, std) * 100000
+    print("P", p)
+    plt.style.use('dark_background')
+    plt.plot(xp, p, linewidth=2)
+    title = "Fit results: mu = %.2f,  std = %.2f" % (mu, std)
+    plt.xlabel('Radial Distance (parsecs)')
+    plt.ylabel('Star Density / Probability Density')
+    plt.title(title)
+    plt.hist(distance, bins=100)
+    plt.legend(['Gaussian Fit', 'Data'])
+    plt.show()
+    
+    # Our median distance is 739.64 parsecs and our standard deviation is 904.92 parsecs.
+    # If we only keep data within 2 sigma of the median, we should get a much better picture of a cluster.
+    
+    for i in range(len(distance)):
+        if distance[i] > mu + 2 * std or distance[i] < mu - 2 * std:
+            distance[i] = np.nan
     
     sky = sky[1:]
     sky = [x.strip().split(',') for x in sky]
@@ -27,13 +57,15 @@ def extract_star_positions(table):
     print("ra type", type(sky))
     print("ra shape", sky.shape)
     print("ra", sky)
+    print("Median Angle:", np.nanmedian(sky, axis=0))
+    print("Median Distance:", np.nanmedian(distance))
     
     ra = sky[:, 0]  # Right Ascension in degrees
     dec = sky[:, 1]  # Declination in degrees
-    # Convert RA, Dec, and Parallax to 3D coordinates
-    x = parallax * np.cos(np.radians(dec)) * np.cos(np.radians(ra))
-    y = parallax * np.cos(np.radians(dec)) * np.sin(np.radians(ra))
-    z = parallax * np.sin(np.radians(dec))
+    # Convert RA, Dec, and Distance to 3D coordinates
+    x = distance * np.cos(np.radians(dec)) * np.cos(np.radians(ra))
+    y = distance * np.cos(np.radians(dec)) * np.sin(np.radians(ra))
+    z = distance * np.sin(np.radians(dec))
     
     return np.array([x, y, z]).T
     
@@ -43,16 +75,39 @@ print("Star Positions (3D):", star_positions)
 
 print("Median Star Position:", np.median(star_positions, axis=0))
 
-fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
-ax.set_box_aspect([1,1,1])  # Aspect ratio is 1:1:1
-ax.set_xlabel('X-axis')
-ax.set_ylabel('Y-axis')
-ax.set_zlabel('Z-axis')
-ax.set_title('3D Plot of Star Positions')
-ax.scatter(star_positions[:, 0], star_positions[:, 1], star_positions[:, 2], c='b', marker='o')
-ax.set_xlim3d(-139,-138)
-ax.set_ylim3d(677,678)
-ax.set_zlim3d(-263, -262)
+# Dark mode plots because hell yeah
+with plt.style.context('dark_background'):
+    # Set the colormap to 'Spectral' for better visibility and also coolness
+    plt.set_cmap('Spectral')
+    plt.rcParams['grid.color'] = (0.5, 0.5, 0.5, 0)
+    fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
+    
+    ax.set_box_aspect([1,1,1])  # Aspect ratio is 1:1:1
+    ax.dist = 100000
+    # Set the labels and title
+    ax.set_xlabel('X-axis')
+    ax.set_ylabel('Y-axis')
+    ax.set_zlabel('Z-axis')
+    ax.set_title('3D Plot of Star Positions')
+    
+    # Scatter plot of star positions
+    ax.scatter(star_positions[:, 0], star_positions[:, 1], star_positions[:, 2], marker='o')
+    
+    # Set the limits for each axis to be, like, reasonable
+    ax.set_xlim3d(-139,-138)
+    ax.set_ylim3d(677,678)
+    ax.set_zlim3d(-263, -262)
+    
+    # Set the initial viewing angle to be pretty close to our original telescope angle
+    ax.view_init(elev=-20.74746374, azim=101.53983887)
+    
+    # Make the x, y, and z planes transparent
+    ax.xaxis.pane.fill = False
+    ax.yaxis.pane.fill = False
+    ax.zaxis.pane.fill = False
+    ax.xaxis.pane.set_edgecolor('none')
+    ax.yaxis.pane.set_edgecolor('none')
+    ax.zaxis.pane.set_edgecolor('none')
 
 
 

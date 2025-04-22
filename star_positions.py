@@ -34,15 +34,26 @@ def get_pixel_positions(files, threshold = 3, plot=False):
     images = [fits.getdata(file) for file in files]
     
     # Step 2: Find the stars in the images using a star detection algorithm 
-    starfinder = DAOStarFinder(threshold=threshold, fwhm=2.0)
+    fwhm = 2.0  # Full Width at Half Maximum (FWHM) of the stars
+    starfinder = DAOStarFinder(threshold=threshold, fwhm=fwhm)
     # Assuming images[0] is gonna have the same stars as the rest of our images? need to check this
     star_locations = starfinder.find_stars(images[0])
     print("Star Locations Found:", star_locations)
     # Step 2.5(optional): Plot the images with detected stars for visual verification
     if plot:
-        plt.imshow(images[0], cmap='gray', origin='lower', vmin=0, vmax=255)
-        plt.scatter(star_locations['xcentroid'], star_locations['ycentroid'], s=1, color='red')
-        plt.title('Detected Stars')
+        plt.style.use('dark_background')
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 10))
+        ax1.imshow(images[0], cmap='gray', origin='lower', vmin=0, vmax=255)
+        ax1.set_title('Original Image')
+        ax1.set_xlabel('X Pixel')
+        ax1.set_ylabel('Y Pixel')
+        
+        ax2.imshow(images[1], cmap='gray', origin='lower', vmin=0, vmax=255)
+        ax2.scatter(star_locations['xcentroid'], star_locations['ycentroid'], s=1, color='red')
+        ax2.set_title(f'Detected Stars, threshold={threshold}, fwhm={fwhm}')
+        ax2.set_xlabel('X Pixel')
+        ax2.set_ylabel('Y Pixel')
+        
         plt.show()
     
     # Step 3: Return the pixel positions of the stars
@@ -56,23 +67,11 @@ def generate_pixel_to_world_matrix():
     Generate a pixel to world coordinate transformation matrix.
     '''
     
-    # HD 49091 is at 415.6 x, 419.7 y, 06 46 03.1812133464 	-20 43 18.623164476, deg 6.7675500    -20.7218389 deg
-    # HD 49126 is at 461 x, 443 y, 06 46 07.2085844088 	-20 45 15.557996412, deg 6.7686667    -20.7543194
-    # HD 49023 is at 298 x, 343 y, 06 45 35.5128422400 	-20 40 51.386328048, deg 6.7598639    -20.6809389 
-    # HD 49317 is at 755 x, 293 y, 06:47:02.63016 	-20:40:32.8224, deg 6.7840639    -20.6757833
-    # HD 48983 is at 263 x, 505 y, 06:45:28.00 	-20:50:23.00, deg 6.7577778    -20.8397222
-    '''
-    pxcoords = np.array([[415.6, 419.7], [461, 443], [298, 343]])
-    skycoords = np.array([
-        SkyCoord("06 46 03.1812133464", "-20 43 18.623164476", unit=(u.hourangle, u.deg)), 
-        SkyCoord("06 46 07.2085844088", "-20 45 15.557996412", unit=(u.hourangle, u.deg)), 
-        SkyCoord("06 45 35.5128422400",	"-20 40 51.386328048", unit=(u.hourangle, u.deg))
-        ])
-    name = ['HD 49091', 'HD 49126', 'HD 49023']
-    known_stars = table.Table([name, pxcoords, skycoords], names=('name', 'px', 'sky'))
-    print("known stars:", known_stars)
-    '''
-    
+    # HD 49091 -- 416 x, 420 y, 06 46 03.18	-20 43 18.62, deg 6.7675500  -20.7218389
+    # HD 49126 -- 461 x, 443 y, 06 46 07.20 -20 45 15.55, deg 6.7686667  -20.7543194
+    # HD 49023 -- 298 x, 343 y, 06 45 35.51 -20 40 51.38, deg 6.7598639  -20.6809389 
+    # HD 49317 -- 755 x, 293 y, 06:47:02.63 -20:40:32.82, deg 6.7840639  -20.6757833
+    # HD 48983 -- 263 x, 505 y, 06:45:28.00 -20:50:23.00, deg 6.7577778  -20.8397222
 
     #found this code on stack overflow. hell yeah
     # https://stackoverflow.com/questions/63594323/astropy-wcs-transfromation-matrix
@@ -80,8 +79,8 @@ def generate_pixel_to_world_matrix():
     stars = SkyCoord(ra=[6.7675500, 6.7686667, 6.7598639, 6.7840639, 6.7577778], 
                     dec=[-20.7218389, -20.7543194, -20.6809389, -20.6757833, -20.8397222], 
                     unit=(u.hourangle ,u.deg))
-    pixels_x = np.array([415.6, 461, 298, 755, 263])
-    pixels_y = np.array([419.7, 443, 343, 293, 505])
+    pixels_x = np.array([416, 461, 298, 755, 263])
+    pixels_y = np.array([420, 443, 343, 293, 505])
     # Create a WCS object and set the pixel coordinates and world coordinates
     pixel_to_world_wcs = fit_wcs_from_points((pixels_x, pixels_y), stars, projection='AIR')
     print("wcs", pixel_to_world_wcs)
