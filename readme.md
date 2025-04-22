@@ -15,7 +15,7 @@ There is some code in here that may be useful to others who want to be able to q
 automatically aligns them so that pixel is always in the same spot. Stupid but it works for my data pretty well! Probably would get messed up if you had cosmic rays or detector artifacts brighter than your science data
 - star_positions.py
   -  This just uses DAOStarFinder to find all the stars based on your input threshold value and returns a numpy array. Might make it more complicated in the future but right now its stupid simple.
-
+![3color](3color.png)
 ![star_positions_dark](star_positions_dark.gif)
 
 
