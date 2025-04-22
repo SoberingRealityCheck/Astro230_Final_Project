@@ -16,7 +16,7 @@ automatically aligns them so that pixel is always in the same spot. Stupid but i
 - star_positions.py
   -  This just uses DAOStarFinder to find all the stars based on your input threshold value and returns a numpy array. Might make it more complicated in the future but right now its stupid simple.
 
-![C06B4CA0-352C-48D9-A12F-687F27D0ED43](https://github.com/user-attachments/assets/47a22bca-4096-4eb4-8bd1-90d0963b3d12)
+![star_positions_dark](star_positions_dark.gif)
 
 
 <h1>project outline:</h1>
@@ -44,6 +44,8 @@ Maybe worth filtering out stars that don't appear in every image? Or at least ev
 Will have a big numpy array with star name, pixel x-y coords, real world RA/Dec coords, Distance/Parallax(?) columns.
 - SIMBAD? Other resources shown in class powerpoint April 10?
 
+THIS IS DONE!!
+got some nice 3d plots too.
 
 **Step 4: Aperture Photometry on each star? Try to find a standard star in the image to calibrate for absolute magnitude.**
 Will be able to add a 'absolute magnitude' in each band to the end of the column, along with color values for B-V and V-R. 
