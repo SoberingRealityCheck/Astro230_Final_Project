@@ -16,6 +16,7 @@ automatically aligns them so that pixel is always in the same spot. Stupid but i
 - star_positions.py
   -  This just uses DAOStarFinder to find all the stars based on your input threshold value and returns a numpy array. Might make it more complicated in the future but right now its stupid simple.
 ![3color](3color.png)
+![image](https://github.com/user-attachments/assets/6ab135ad-462d-4db8-8d92-34bb58698a52)
 ![star_positions_dark](star_positions_dark.gif)
 
 
