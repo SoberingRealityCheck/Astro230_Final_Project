@@ -1,5 +1,9 @@
 This is my repository to store all the code and data I have been working with for my ASTR 230 Astronomy Lab Final Project. 
 
+The objective of this project is to perform several layers of structural and topological analysis on M41 'Little Beehive Cluster' to determine if there is a relationship between Stellar characteristics and radial distance to the cluster center. My hypothesis is that denser / hotter / bluer stars will exist more frequently and in higher density near the cluster center.
+
+To test my theory, I am using both self-collected data from McDonald Observatory's .8m PFI telescope in Fort Davis, TX and parallax data from Gaia DR3. 
+
 There is some code in here that may be useful to others who want to be able to quickly search for fits files or do fast data reduction / alignment.
 
 <h1>Code in this repository:</h1>
