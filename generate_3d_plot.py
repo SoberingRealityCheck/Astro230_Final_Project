@@ -25,11 +25,10 @@ def extract_star_positions(table):
     # Crop out the crazy outliers from the data. Stuff that is farther than 10000 parsecs is probably not in our cluster
     print("Distance before cropping", distance)
     
-    '''
+    
     for i in range(len(distance)):
         if distance[i] > 4000:
             distance[i] = np.nan
-    '''
     
     # Some fun with getting a gaussian fit to our distance data to see where our cluster probably is
     mu = np.nanmedian(distance)

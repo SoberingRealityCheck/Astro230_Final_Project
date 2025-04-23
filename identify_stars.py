@@ -91,8 +91,8 @@ if __name__ == "__main__":
     print("Nearby Stars:", nearby_stars)
 
     # Assuming pixel_positions is a list of pixel coordinates of stars
-    pixel_positions = np.load(path+'../star_pos_identification/pixel_positions.npy', allow_pickle=True)
-    skyvals = np.load(path+'../star_pos_identification/skyvals.npy', allow_pickle=True)
+    pixel_positions = np.load(path+'../star_pos_identification/B_20s_combined_pixel_positions.npy', allow_pickle=True)
+    skyvals = np.load(path+'../star_pos_identification/B_20s_combined_skyvals.npy', allow_pickle=True)
     
     # Identify stars from our photo that match the nearby stars in our Simbad search
     identified_stars = identify_stars(skyvals, pixel_positions, nearby_stars)

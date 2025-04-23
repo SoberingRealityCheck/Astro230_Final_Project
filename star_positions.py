@@ -46,14 +46,18 @@ def get_pixel_positions(file, threshold = 3, plot=False):
         filename = file.split('/')[-1]
         filename = filename.split('\\')[1]
         
+        # Also define a nice logarithmic scale for our images
+        from matplotlib.colors import LogNorm
+        log_norm = LogNorm(vmin=10, vmax = np.max(image))
+        
         plt.style.use('dark_background')
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 10))
-        ax1.imshow(image, cmap='gray', origin='lower', vmin=0, vmax=255)
+        ax1.imshow(image, cmap='gray', origin='lower', norm=log_norm)
         ax1.set_title(f'Original Image: \n {filename}')
         ax1.set_xlabel('X Pixel')
         ax1.set_ylabel('Y Pixel')
         
-        ax2.imshow(image, cmap='gray', origin='lower', vmin=0, vmax=255)
+        ax2.imshow(image, cmap='gray', origin='lower', norm=log_norm)
         ax2.scatter(star_locations['xcentroid'], star_locations['ycentroid'], s=1, color='red')
         ax2.set_title(f'Detected Stars, threshold={threshold}, fwhm={fwhm}')
         ax2.set_xlabel('X Pixel')
@@ -124,6 +128,9 @@ def get_star_locations(star_positions, wcs):
 
 if __name__ == "__main__":
     # Example usage
+    PLOT_PIXEL = False
+    PLOT_WCS = False
+    
     files = fits_get(path + 'combined/')
     print("Files to be processed:", files)
     for file in files:
@@ -132,18 +139,19 @@ if __name__ == "__main__":
         print("Filename:", filename)
         file_id = filename.split('.')[0]
         print("Processing file:", file)
-        pixel_positions = get_pixel_positions(file, threshold=100, plot=False)
+        pixel_positions = get_pixel_positions(file, threshold=50, plot=PLOT_PIXEL)
         print("Pixel Positions of Stars:", pixel_positions)
         pixel_to_world_wcs = generate_pixel_to_world_matrix()
         skyvals = get_star_locations(pixel_positions, pixel_to_world_wcs)
-        for i in range(len(skyvals)):
-            plt.scatter(skyvals[i].ra, skyvals[i].dec, s=1, color='red')
-        plt.xlabel('RA (degrees)')
-        plt.ylabel('Dec (degrees)')
-        plt.title('Star Locations in RA/Dec')
-        plt.show()
-        plt.xlim(103,105)
-        plt.ylim(-21,-19)
+        if PLOT_WCS:
+            for i in range(len(skyvals)):
+                plt.scatter(skyvals[i].ra, skyvals[i].dec, s=1, color='red')
+            plt.xlabel('RA (degrees)')
+            plt.ylabel('Dec (degrees)')
+            plt.title('Star Locations in RA/Dec')
+            plt.show()
+            plt.xlim(103,105)
+            plt.ylim(-21,-19)
         # Save the pixel positions to a numpy file
         np.save(path + f'../star_pos_identification/{file_id}_pixel_positions.npy', pixel_positions)
         np.save(path + f'../star_pos_identification/{file_id}_skyvals.npy', skyvals)
