@@ -12,21 +12,26 @@ from config import path, filetypes
 from get_files import fits_get
 
 
-'''
-We will be using the astroalign library. Because I am lazy and don't want to manually do this anymore. 
-# let's test and see how well a pre-written alignment package handles this! lol. 
-
-Update: astroalign sucks. Can't get it to work. Just going to match up the brightest pixel in each image, lol.
-'''
-
 def align_and_combine(filepath, output_path):
     """
-    Aligns and combines a list of FITS files using astroalign.
-
+    Aligns and combines a list of FITS files using the famous Just Check The Brightest Pixel In Each Image approach.
+    Astroalign sucks.
+    
     Parameters:
         files (list): List of file paths to the FITS files to be aligned and combined.
         output_path (str): Path where the combined FITS files will be saved.
     """
+    # Use only one file as the reference for everything else so alignment is easier (this is arbitrarily the first file in the list)
+    initial_band = list(filetypes.keys())[0]
+    initial_exptime = filetypes[initial_band][0]
+    initial_files = fits_get(filepath, initial_band, str(initial_exptime))
+    
+    reference_image, reference_header = fits.getdata(initial_files[0], header=True)
+    
+    reference_image = reference_image - np.median(reference_image)  # Subtract the background
+    reference_star_value = np.max(reference_image) # Find the brightest pixel in the image
+    reference_star_location = np.squeeze(np.where(reference_image == reference_star_value)) # Get the coordinates of that spot
+    
     for band_selected in filetypes.keys():
         exptimes = filetypes[band_selected]
         for exptime in exptimes:
@@ -37,14 +42,8 @@ def align_and_combine(filepath, output_path):
             # Initialize an empty list to store the aligned images
             aligned_images = []
             
-            # Align each file with the first file in the list
-            reference_image, reference_header = fits.getdata(relevant_files[0], header=True)
-            
-            reference_image = reference_image - np.median(reference_image)  # Subtract the background
-            
-            reference_star_value = np.max(reference_image)
-            reference_star_location = np.squeeze(np.where(reference_image == reference_star_value))
-            
+            # Align each file with the first file in the list (the reference image)
+            # This is a bit of a hack, but it works for now.
             #to make sure it's all working correctly, let's also track where each 'reference star' location is for each image
             reference_star_positions = []
             
