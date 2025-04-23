@@ -17,12 +17,12 @@ from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 from get_files import fits_get
 from config import path
 
-def get_pixel_positions(files, threshold = 3, plot=False):
+def get_pixel_positions(file, threshold = 3, plot=False):
     """
     Get the pixel positions of stars in the image.
     
     Args:
-        files (list): List of file paths to the images.
+        file (filepath): filepath to the image.
         threshold (float): Threshold for star detection.
         plot (bool): Whether to plot the images with detected stars.
     
@@ -30,25 +30,30 @@ def get_pixel_positions(files, threshold = 3, plot=False):
         list: List of pixel positions of stars in the images.
     """
     
-    # Step 1: Load the images
-    images = [fits.getdata(file) for file in files]
+    # Step 1: Load the image
+    image = fits.getdata(file)
     
     # Step 2: Find the stars in the images using a star detection algorithm 
     fwhm = 2.0  # Full Width at Half Maximum (FWHM) of the stars
     starfinder = DAOStarFinder(threshold=threshold, fwhm=fwhm)
-    # Assuming images[0] is gonna have the same stars as the rest of our images? need to check this
-    star_locations = starfinder.find_stars(images[0])
+    
+    # Checking the code with a single image.
+    star_locations = starfinder.find_stars(image)
     print("Star Locations Found:", star_locations)
     # Step 2.5(optional): Plot the images with detected stars for visual verification
     if plot:
+        # Get the nice looking filename for the plot title
+        filename = file.split('/')[-1]
+        filename = filename.split('\\')[1]
+        
         plt.style.use('dark_background')
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 10))
-        ax1.imshow(images[0], cmap='gray', origin='lower', vmin=0, vmax=255)
-        ax1.set_title('Original Image')
+        ax1.imshow(image, cmap='gray', origin='lower', vmin=0, vmax=255)
+        ax1.set_title(f'Original Image: \n {filename}')
         ax1.set_xlabel('X Pixel')
         ax1.set_ylabel('Y Pixel')
         
-        ax2.imshow(images[1], cmap='gray', origin='lower', vmin=0, vmax=255)
+        ax2.imshow(image, cmap='gray', origin='lower', vmin=0, vmax=255)
         ax2.scatter(star_locations['xcentroid'], star_locations['ycentroid'], s=1, color='red')
         ax2.set_title(f'Detected Stars, threshold={threshold}, fwhm={fwhm}')
         ax2.set_xlabel('X Pixel')
@@ -120,18 +125,25 @@ def get_star_locations(star_positions, wcs):
 if __name__ == "__main__":
     # Example usage
     files = fits_get(path + 'combined/')
-    pixel_positions = get_pixel_positions(files, threshold=100, plot=True)
-    print("Pixel Positions of Stars:", pixel_positions)
-    pixel_to_world_wcs = generate_pixel_to_world_matrix()
-    skyvals = get_star_locations(pixel_positions, pixel_to_world_wcs)
-    for i in range(len(skyvals)):
-        plt.scatter(skyvals[i].ra, skyvals[i].dec, s=1, color='red')
-    plt.xlabel('RA (degrees)')
-    plt.ylabel('Dec (degrees)')
-    plt.title('Star Locations in RA/Dec')
-    plt.show()
-    plt.xlim(103,105)
-    plt.ylim(-21,-19)
-    # Save the pixel positions to a numpy file
-    np.save(path + '../star_pos_identification/pixel_positions.npy', pixel_positions)
-    np.save(path + '../star_pos_identification/skyvals.npy', skyvals)
+    print("Files to be processed:", files)
+    for file in files:
+        filename = file.split('/')[-1]
+        filename = filename.split('\\')[1]
+        print("Filename:", filename)
+        file_id = filename.split('.')[0]
+        print("Processing file:", file)
+        pixel_positions = get_pixel_positions(file, threshold=100, plot=False)
+        print("Pixel Positions of Stars:", pixel_positions)
+        pixel_to_world_wcs = generate_pixel_to_world_matrix()
+        skyvals = get_star_locations(pixel_positions, pixel_to_world_wcs)
+        for i in range(len(skyvals)):
+            plt.scatter(skyvals[i].ra, skyvals[i].dec, s=1, color='red')
+        plt.xlabel('RA (degrees)')
+        plt.ylabel('Dec (degrees)')
+        plt.title('Star Locations in RA/Dec')
+        plt.show()
+        plt.xlim(103,105)
+        plt.ylim(-21,-19)
+        # Save the pixel positions to a numpy file
+        np.save(path + f'../star_pos_identification/{file_id}_pixel_positions.npy', pixel_positions)
+        np.save(path + f'../star_pos_identification/{file_id}_skyvals.npy', skyvals)

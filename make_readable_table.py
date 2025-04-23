@@ -6,6 +6,8 @@ star_table = Table.read(path + '../star_matching/target_table.tex')
 readable_table = Table()
 readable_table['name'] = star_table['name'][1:]
 
+# Shoutout to the person on stackoverflow who provided this function to truncate floats to a certain number of decimal places
+# https://stackoverflow.com/questions/8595973/truncate-to-three-decimals-in-python
 import math
 def truncate(number, digits) -> float:
     # Improve accuracy with floating point operations, to avoid truncate(16.4, 2) = 16.39 or truncate(-1.13, 2) = -1.12

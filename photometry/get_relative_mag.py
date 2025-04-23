@@ -1,1 +1,0 @@
-#do some aperture photometry shit here
