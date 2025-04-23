@@ -1,5 +1,9 @@
 This is my repository to store all the code and data I have been working with for my ASTR 230 Astronomy Lab Final Project. 
 
+The objective of this project is to perform several layers of structural and topological analysis on M41 'Little Beehive Cluster' to determine if there is a relationship between Stellar characteristics and radial distance to the cluster center. My hypothesis is that denser / hotter / bluer stars will exist more frequently and in higher density near the cluster center.
+
+To test my theory, I am using both self-collected data from McDonald Observatory's .8m PFI telescope in Fort Davis, TX and parallax data from Gaia DR3. 
+
 There is some code in here that may be useful to others who want to be able to quickly search for fits files or do fast data reduction / alignment.
 
 <h1>Code in this repository:</h1>
@@ -15,7 +19,8 @@ There is some code in here that may be useful to others who want to be able to q
 automatically aligns them so that pixel is always in the same spot. Stupid but it works for my data pretty well! Probably would get messed up if you had cosmic rays or detector artifacts brighter than your science data
 - star_positions.py
   -  This just uses DAOStarFinder to find all the stars based on your input threshold value and returns a numpy array. Might make it more complicated in the future but right now its stupid simple.
-
+![3color](3color.png)
+![image](https://github.com/user-attachments/assets/6ab135ad-462d-4db8-8d92-34bb58698a52)
 ![star_positions_dark](star_positions_dark.gif)
 
 
@@ -25,7 +30,7 @@ Here's the general game plan of how this project will work!
 
 **Step 1: Reduce the data.** 
 This is simple, done it a million times, easy peasy. 
-Will end up with 6 or 7 separate images (Long/Medium/Short exposures in the B, V, R bands). 
+Will end up with 7 separate images (Long/Medium/Short exposures in the B, V, R bands). 
 
 THIS IS DONE!!! 
 V band images look a little sus - it might be nice to get some more data so I have more than just 2 images at each setting. 
