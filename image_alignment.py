@@ -39,6 +39,10 @@ def align_and_combine(filepath, output_path):
             # Get the list of files for the current band and exposure time
             relevant_files = fits_get(filepath, band_selected, str(exptime))
             
+            _, first_header = fits.getdata(relevant_files[0], header=True)
+            current_band = first_header['INSFILTE']
+            current_exptime = str(int(first_header['EXPTIME']))
+            
             # Initialize an empty list to store the aligned images
             aligned_images = []
             
@@ -93,7 +97,7 @@ def align_and_combine(filepath, output_path):
             # Save the combined image to a new FITS file
             combined_filename = f"{band_selected}_{exptime}s_combined.fits"
             print(f"Saving combined image to {output_path + combined_filename}")
-            fits.writeto(os.path.join(output_path, combined_filename), combined_image, header=reference_header, overwrite=True)
+            fits.writeto(os.path.join(output_path, combined_filename), combined_image, header=first_header, overwrite=True)
 
 # Example usage of the align_and_combine function
 if __name__ == "__main__":

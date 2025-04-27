@@ -24,10 +24,10 @@ def get_counts(pixel_positions, imdata):
     fwhms = psf.fit_fwhm(imdata, xypos=pixel_positions, fit_shape=7)
     apertures = CircularAperture(pixel_positions, r=np.nanmedian(fwhms))  
     annuli = CircularAnnulus(pixel_positions, r_in=6, r_out=10)
-    phot_table = aperture_photometry(pixel_positions, apertures)  
+    phot_table = aperture_photometry(imdata, apertures)  
     print("Photometry Table:", phot_table)
     
-    pass
+    return phot_table
 
 def magnitudes_from_counts(counts, reference_counts, reference_magnitude):
     '''
@@ -52,23 +52,97 @@ if __name__ == "__main__":
     from config import path
     from get_files import fits_get
     from astropy.io import fits
+    from astropy.table import Table
     
-    pixel_positions = np.load(path + '../star_pos_identification/pixel_positions.npy', allow_pickle=True)
+    target_table = Table.read(path + '../star_matching/target_table.tex')
+    # Extract the pixel positions from the target table
+    pixel_positions = target_table['pixel_pos'].data[1:]
     
+    # Format the pixel positions into a list of tuples so photutils is happy
+    pixel_positions = [x.strip().split('..') for x in pixel_positions]
+    pixel_positions = np.array(pixel_positions, dtype=float)
+    
+    print("Pixel Positions Loaded:", pixel_positions)
+    
+    # Get the list of FITS files to process
     files = fits_get(path + 'combined/')
     print("Files to be processed:", files)
     
+    # Loop through each FITS file and perform photometry on each one
     for i, file in enumerate(files):
-        image_data, header = fits.getdata(file, header=True)
-        # Assuming imdata is the image data from the FITS file
-        imdata = image_data
+        
+        imdata, header = fits.getdata(file, header=True)
+        
+        band = header['INSFILTE']
+        exptime = int(header['EXPTIME'])
+        print(f"Analyzing dataset number {i+1} from {band} band with exposure time of {exptime} seconds...")
         
         counts = get_counts(pixel_positions, imdata)
         print("Counts Obtained for file", i)
         print(counts)
         
         # Save the counts to a numpy file
-        np.save(path + '../star_pos_identification/counts_' + str(i) + '.npy', counts)
+        np.save(path + '../photometry/counts_' + band + '_' + str(exptime) + '.npy', counts)
+        
+        counts['name'] = target_table['name'][1:]
+        
+        print("Counts Table:", counts)
+        # Save the counts table to a LaTeX file
+        counts.write(path + '../photometry/counts_' + band + '_' + str(exptime) + '.tex', format='latex', overwrite=True)
+        
+        # Reference Magnitude:
+        # HD 48924 (the reference star) has a magnitude of: 
+        # 9.28 in the B band, 9.36 in the V band, unknown in the R band. Can at least use it for B and V calibration.
+        
+        # Going to make a nested dictionary of reference magnitudes and counts for each band and exposure time.
+        reference_dictionary = {
+            'B20': {
+                'reference_magnitude': 9.28,
+                'reference_counts': 208880.30191664075
+            },
+            'B60': {
+                'reference_magnitude': 9.28,
+                'reference_counts': None
+            },
+            'V20': {
+                'reference_magnitude': 9.36,
+                'reference_counts': None
+            },
+            'V7': {
+                'reference_magnitude': 9.36,
+                'reference_counts': None
+            },
+            'V3': {
+                'reference_magnitude': 9.36,
+                'reference_counts': None
+            },
+            'R10': {
+                'reference_magnitude': None,
+                'reference_counts': None
+            },
+            'R4': {
+                'reference_magnitude': None,
+                'reference_counts': None
+            },
+        }
+        
+        # Loops access this dictionary with a key of the form BandExptime (e.g. B20, V7, etc.)
+        key = str(band) + str(exptime)
+        
+        reference_magnitude = reference_dictionary[key]['reference_magnitude']
+        reference_counts = reference_dictionary[key]['reference_counts']
+        
+        
+        # Gotta format counts into just a numpy array for the function to work
+        count_array = np.array([counts['aperture_sum'].data])
+        count_array = count_array.astype(float)
+        count_array = count_array.flatten()
+        print("Count Array:", count_array)
         
         # Get the magnitudes from the counts
-        magnitudes = magnitudes_from_counts(counts)
+        magnitudes = magnitudes_from_counts(count_array, reference_counts, reference_magnitude)
+        print("Magnitudes:", magnitudes)
+        
+        np.save(path + '../photometry/magnitudes_' + band + '_' + str(exptime) + '.npy', magnitudes)
+        
+

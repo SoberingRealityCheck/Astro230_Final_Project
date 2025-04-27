@@ -76,11 +76,11 @@ def generate_pixel_to_world_matrix():
     Generate a pixel to world coordinate transformation matrix.
     '''
     
-    # HD 49091 -- 416 x, 420 y, 06 46 03.18	-20 43 18.62, deg 6.7675500  -20.7218389
-    # HD 49126 -- 461 x, 443 y, 06 46 07.20 -20 45 15.55, deg 6.7686667  -20.7543194
-    # HD 49023 -- 298 x, 343 y, 06 45 35.51 -20 40 51.38, deg 6.7598639  -20.6809389 
-    # HD 49317 -- 755 x, 293 y, 06:47:02.63 -20:40:32.82, deg 6.7840639  -20.6757833
-    # HD 48983 -- 263 x, 505 y, 06:45:28.00 -20:50:23.00, deg 6.7577778  -20.8397222
+    # HD 49091 -- 416.42371 x, 420.80733 y, 06 46 03.18	-20 43 18.62, deg 6.7675500  -20.7218389
+    # HD 49126 -- 467.76442 x, 393.25411 y, 06 46 07.20 -20 45 15.55, deg 6.7686667  -20.7543194
+    # HD 49023 -- 304.3124 x, 293.98475 y, 06 45 35.51 -20 40 51.38, deg 6.7598639  -20.6809389 
+    # HD 49317 -- 755.22029 x, 293.52529 y, 06:47:02.63 -20:40:32.82, deg 6.7840639  -20.6757833
+    # HD 48983 -- 263.55565 x, 504.59604 y, 06:45:28.00 -20:50:23.00, deg 6.7577778  -20.8397222
 
     #found this code on stack overflow. hell yeah
     # https://stackoverflow.com/questions/63594323/astropy-wcs-transfromation-matrix
@@ -88,8 +88,8 @@ def generate_pixel_to_world_matrix():
     stars = SkyCoord(ra=[6.7675500, 6.7686667, 6.7598639, 6.7840639, 6.7577778], 
                     dec=[-20.7218389, -20.7543194, -20.6809389, -20.6757833, -20.8397222], 
                     unit=(u.hourangle ,u.deg))
-    pixels_x = np.array([416, 461, 298, 755, 263])
-    pixels_y = np.array([420, 443, 343, 293, 505])
+    pixels_x = np.array([416.42371, 467.76442, 304.3124, 755.22029, 263.55565])
+    pixels_y = np.array([420.80733, 393.25411, 293.98475, 293.52529, 504.59604])
     # Create a WCS object and set the pixel coordinates and world coordinates
     pixel_to_world_wcs = fit_wcs_from_points((pixels_x, pixels_y), stars, projection='AIR')
     print("wcs", pixel_to_world_wcs)
@@ -104,7 +104,7 @@ def generate_pixel_to_world_matrix():
     print("")
     return pixel_to_world_wcs
 
-def get_star_locations(star_positions, wcs):
+def get_coords_from_pixel(star_positions, wcs):
     """
     Convert pixel locations to RA/Dec locations using a known reference point and the FOV of the sensor.
 
@@ -126,6 +126,24 @@ def get_star_locations(star_positions, wcs):
     print(skyvals)  # (RA, Dec) in degrees
     return skyvals
 
+def get_pixel_from_coords(skyvals):
+    """
+    Convert RA/Dec locations to pixel locations using a known reference point and the FOV of the sensor.
+
+    Args:
+        skyvals (list): List of RA/Dec locations of stars.
+        wcs (WCS): WCS object for the image.
+
+    Returns:
+        list: List of pixel locations of stars.
+    """
+    wcs = generate_pixel_to_world_matrix()
+    pixel_positions = []
+    for skyval in skyvals:
+        pixel_pos_new = (skycoord_to_pixel(skyval, wcs, origin=0))
+        pixel_positions.append(pixel_pos_new)
+    return np.array(pixel_positions)
+
 if __name__ == "__main__":
     # Example usage
     PLOT_PIXEL = False
@@ -142,7 +160,7 @@ if __name__ == "__main__":
         pixel_positions = get_pixel_positions(file, threshold=50, plot=PLOT_PIXEL)
         print("Pixel Positions of Stars:", pixel_positions)
         pixel_to_world_wcs = generate_pixel_to_world_matrix()
-        skyvals = get_star_locations(pixel_positions, pixel_to_world_wcs)
+        skyvals = get_coords_from_pixel(pixel_positions, pixel_to_world_wcs)
         if PLOT_WCS:
             for i in range(len(skyvals)):
                 plt.scatter(skyvals[i].ra, skyvals[i].dec, s=1, color='red')
