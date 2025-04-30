@@ -79,6 +79,7 @@ if __name__ == "__main__":
         counts = get_counts(pixel_positions, imdata)
         print("Counts Obtained for file", i)
         #print(counts)
+        print("HD 48924:", counts[6])
         print("CPD-20 1613:", counts[269])
         # Save the counts to a numpy file
         np.save(path + '../photometry/counts_' + band + '_' + str(exptime) + '.npy', counts)
@@ -102,23 +103,23 @@ if __name__ == "__main__":
         reference_dictionary = {
             'B20': {
                 'reference_magnitude': 9.28,
-                'reference_counts': 208880.30191664075
+                'reference_counts': 206628.03353289087
             },
             'B60': {
                 'reference_magnitude': 9.28,
-                'reference_counts': 118826.63344725754
+                'reference_counts': 215392.88717979766
             },
             'V20': {
                 'reference_magnitude': 9.36,
-                'reference_counts': 399347.81419154577
+                'reference_counts': 312568.4788411274
             },
             'V7': {
                 'reference_magnitude': 9.36,
-                'reference_counts': 192733.27095290253
+                'reference_counts': 111152.57389666102
             },
             'V3': {
                 'reference_magnitude': 9.36,
-                'reference_counts': 44683.902504858124
+                'reference_counts': 13282.063955575997
             },
             'R10': {
                 'reference_magnitude': 10.080,
