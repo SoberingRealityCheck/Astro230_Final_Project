@@ -137,7 +137,7 @@ def generate_pixel_to_world_matrix():
     print("WCS TEST")
     print("--------------------")
     print("star 1 pixel:", pixel_to_world_wcs.world_to_pixel(stars[0]))
-    print("star 1 actual pixel:", (415.6, 419.7))
+    print("star 1 actual pixel:", pixels_x[0], pixels_y[0])
     print("")
     return pixel_to_world_wcs
 
