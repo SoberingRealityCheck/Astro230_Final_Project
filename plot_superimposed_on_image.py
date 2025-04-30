@@ -56,10 +56,10 @@ def plot_superimposed_on_image(image_file, star_positions, output_file, table = 
         blue = np.where(colors == 'blue')
         yellow = np.where(colors == 'yellow')
         
-        ax.scatter(star_positions[blue, 0], star_positions[blue, 1], c='blue', s=10, edgecolor='white', alpha=0.5, label='<10')
-        ax.scatter(star_positions[green, 0], star_positions[green, 1], c='green', s=10, edgecolor='white', alpha=0.5, label = '10-15')
-        ax.scatter(star_positions[yellow, 0], star_positions[yellow, 1], c='yellow', s=10, edgecolor='white', alpha=0.5, label='15-20')
-        ax.scatter(star_positions[red, 0], star_positions[red, 1], c='red', s=10, edgecolor='white', alpha=0.5, label = '>20')
+        ax.scatter(star_positions[blue, 0], star_positions[blue, 1], c='blue', s=10, marker='x', alpha=0.5, label='<10')
+        ax.scatter(star_positions[green, 0], star_positions[green, 1], c='green', s=10, marker='x', alpha=0.5, label = '10-15')
+        ax.scatter(star_positions[yellow, 0], star_positions[yellow, 1], c='yellow', s=10, marker='x', alpha=0.5, label='15-20')
+        ax.scatter(star_positions[red, 0], star_positions[red, 1], c='red', s=10, marker='x', alpha=0.5, label = '>20')
         plt.legend(loc='upper right')
         ax.set_title('Magnitudes of Stars Identified in our Image')
     
