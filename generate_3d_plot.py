@@ -112,7 +112,7 @@ def extract_star_positions(table):
 
 
     return np.array([x, y, z, c]).T
-star_table = Table.read(path + '../star_matching/target_table.tex')
+star_table = Table.read(path + '../star_matching/target_table_part3.tex')
 star_positions = extract_star_positions(star_table)
 print("Star Positions (3D):", star_positions)
 

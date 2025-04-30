@@ -45,7 +45,6 @@ def magnitudes_from_counts(counts, reference_counts, reference_magnitude):
     '''
     return -2.5 * np.log10(counts / reference_counts) + reference_magnitude
 
-
 if __name__ == "__main__":
     # Example usage
     
@@ -79,20 +78,23 @@ if __name__ == "__main__":
         
         counts = get_counts(pixel_positions, imdata)
         print("Counts Obtained for file", i)
-        print(counts)
-        
+        #print(counts)
+        print("CPD-20 1613:", counts[269])
         # Save the counts to a numpy file
         np.save(path + '../photometry/counts_' + band + '_' + str(exptime) + '.npy', counts)
         
         counts['name'] = target_table['name'][1:]
         
-        print("Counts Table:", counts)
+        #print("Counts Table:", counts)
         # Save the counts table to a LaTeX file
         
         
         # Reference Magnitude:
         # HD 48924 (the reference star) has a magnitude of: 
         # 9.28 in the B band, 9.36 in the V band, unknown in the R band. Can at least use it for B and V calibration.
+        
+        # CPD-20 1613 (the R reference star) has a magnitude of:
+        # 10.080 in the R band. Boom! Everything is calibrated.
         
         # Going to make a nested dictionary of reference magnitudes and counts for each band and exposure time.
         # All '1' values are just placeholders for the reference counts, which I have not yet calculated. Results will thus be very inaccurate.
@@ -119,12 +121,12 @@ if __name__ == "__main__":
                 'reference_counts': 44683.902504858124
             },
             'R10': {
-                'reference_magnitude': 9.924,
-                'reference_counts': 1
+                'reference_magnitude': 10.080,
+                'reference_counts': 144704.63437815293
             },
             'R4': {
-                'reference_magnitude': 9.924,
-                'reference_counts': 1
+                'reference_magnitude': 10.080,
+                'reference_counts': 92979.3439804231
             },
         }
         
@@ -139,12 +141,12 @@ if __name__ == "__main__":
         count_array = np.array([counts['aperture_sum'].data])
         count_array = count_array.astype(float)
         count_array = count_array.flatten()
-        print("Count Array:", count_array)
+        #print("Count Array:", count_array)
         
         # Get the magnitudes from the counts
         magnitudes = magnitudes_from_counts(count_array, reference_counts, reference_magnitude)
-        print("Magnitudes:", magnitudes)
-        print("Magnitudes Shape:", magnitudes.shape)
+        #print("Magnitudes:", magnitudes)
+        #print("Magnitudes Shape:", magnitudes.shape)
         
         counts['AppMag'] = magnitudes
         

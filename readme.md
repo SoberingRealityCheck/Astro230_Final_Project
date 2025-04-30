@@ -56,11 +56,13 @@ got some nice 3d plots too.
 Will be able to add a 'absolute magnitude' in each band to the end of the column, along with color values for B-V and V-R. 
 - Need to refresh on exactly how this process works. Think there was a tutorial in the 'What's in an Image?' module.
 
+THIS IS DONE!!
 
 **Step 5: HR Diagram fitting. Use the color values to determine the temp of the stars. Use the distance + magnitude to estimate absolute magnitude.**
 Will end up with a nice HR diagram of the whole image showing what we're able to see for each star. Should make it easier to identify any non-cluster members in our image.
 - Need to understand more on HR diagrams. Study up!
 
+THIS IS DONE!!
 
 **Step 6: Possible Analysis.**
 Plot the data as a 3D Matplotlib scatter. Examine structure!
