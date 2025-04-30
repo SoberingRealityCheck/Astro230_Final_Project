@@ -62,7 +62,7 @@ THIS IS DONE!!
 Will end up with a nice HR diagram of the whole image showing what we're able to see for each star. Should make it easier to identify any non-cluster members in our image.
 - Need to understand more on HR diagrams. Study up!
 
-THIS
+THIS IS DONE!!
 
 **Step 6: Possible Analysis.**
 Plot the data as a 3D Matplotlib scatter. Examine structure!
