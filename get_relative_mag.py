@@ -25,7 +25,7 @@ def get_counts(pixel_positions, imdata):
     apertures = CircularAperture(pixel_positions, r=np.nanmedian(fwhms))  
     annuli = CircularAnnulus(pixel_positions, r_in=6, r_out=10)
     phot_table = aperture_photometry(imdata, apertures)  
-    print("Photometry Table:", phot_table)
+    #print("Photometry Table:", phot_table)
     
     return phot_table
 
@@ -63,14 +63,14 @@ if __name__ == "__main__":
     pixel_positions = np.array(pixel_positions, dtype=float)
     
     print("Pixel Positions Loaded:", pixel_positions)
-    
+    print("Pixel Positions Shape:", pixel_positions.shape)
     # Get the list of FITS files to process
     files = fits_get(path + 'combined/')
     print("Files to be processed:", files)
     
     # Loop through each FITS file and perform photometry on each one
     for i, file in enumerate(files):
-        
+         
         imdata, header = fits.getdata(file, header=True)
         
         band = header['INSFILTE']
@@ -88,13 +88,15 @@ if __name__ == "__main__":
         
         print("Counts Table:", counts)
         # Save the counts table to a LaTeX file
-        counts.write(path + '../photometry/counts_' + band + '_' + str(exptime) + '.tex', format='latex', overwrite=True)
+        
         
         # Reference Magnitude:
         # HD 48924 (the reference star) has a magnitude of: 
         # 9.28 in the B band, 9.36 in the V band, unknown in the R band. Can at least use it for B and V calibration.
         
         # Going to make a nested dictionary of reference magnitudes and counts for each band and exposure time.
+        # All '1' values are just placeholders for the reference counts, which I have not yet calculated. Results will thus be very inaccurate.
+        # I will update this dictionary with the correct values once I have them.
         reference_dictionary = {
             'B20': {
                 'reference_magnitude': 9.28,
@@ -102,27 +104,27 @@ if __name__ == "__main__":
             },
             'B60': {
                 'reference_magnitude': 9.28,
-                'reference_counts': None
+                'reference_counts': 118826.63344725754
             },
             'V20': {
                 'reference_magnitude': 9.36,
-                'reference_counts': None
+                'reference_counts': 399347.81419154577
             },
             'V7': {
                 'reference_magnitude': 9.36,
-                'reference_counts': None
+                'reference_counts': 192733.27095290253
             },
             'V3': {
                 'reference_magnitude': 9.36,
-                'reference_counts': None
+                'reference_counts': 44683.902504858124
             },
             'R10': {
-                'reference_magnitude': None,
-                'reference_counts': None
+                'reference_magnitude': 9.924,
+                'reference_counts': 1
             },
             'R4': {
-                'reference_magnitude': None,
-                'reference_counts': None
+                'reference_magnitude': 9.924,
+                'reference_counts': 1
             },
         }
         
@@ -142,7 +144,38 @@ if __name__ == "__main__":
         # Get the magnitudes from the counts
         magnitudes = magnitudes_from_counts(count_array, reference_counts, reference_magnitude)
         print("Magnitudes:", magnitudes)
+        print("Magnitudes Shape:", magnitudes.shape)
+        
+        counts['AppMag'] = magnitudes
         
         np.save(path + '../photometry/magnitudes_' + band + '_' + str(exptime) + '.npy', magnitudes)
-        
+        counts.write(path + '../photometry/counts_' + band + '_' + str(exptime) + '.tex', format='latex', overwrite=True)
 
+    # Average out the magnitudes across each band to get band magnitudes for each star
+    V20 = np.load(path + '../photometry/magnitudes_V_20.npy', allow_pickle=True)
+    V7 = np.load(path + '../photometry/magnitudes_V_7.npy', allow_pickle=True)
+    V3 = np.load(path + '../photometry/magnitudes_V_3.npy', allow_pickle=True)
+    B20 = np.load(path + '../photometry/magnitudes_B_20.npy', allow_pickle=True)
+    B60 = np.load(path + '../photometry/magnitudes_B_60.npy', allow_pickle=True)
+    R10 = np.load(path + '../photometry/magnitudes_R_10.npy', allow_pickle=True)
+    R4 = np.load(path + '../photometry/magnitudes_R_4.npy', allow_pickle=True)
+    
+    v_average = (V20 + V7 + V3) / 3
+    b_average = (B20 + B60) / 2
+    r_average = (R10 + R4) / 2
+    
+    print("V Average:", v_average)
+    print("V Average Shape:", v_average.shape)
+    
+    new_target_table = Table.read(path + '../star_matching/target_table.tex')
+    # Remove the first row (header) from the target table
+    new_target_table.remove_row(0)
+    
+    # Update our target table with the apparent magnitudes in each band
+    new_target_table.add_column(v_average, name='V_apparent')
+    new_target_table.add_column(b_average, name='B_apparent')
+    new_target_table.add_column(r_average, name='R_apparent')
+    
+    print("Updated Target Table:", new_target_table)
+    
+    new_target_table.write(path + '../star_matching/target_table_part2.tex', format='latex', overwrite=True)

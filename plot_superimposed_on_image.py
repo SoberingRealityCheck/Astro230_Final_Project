@@ -25,15 +25,16 @@ def plot_superimposed_on_image(image_file, star_positions, output_file, table = 
         colors = generate_sigma_colors(table)
         ax.scatter(star_positions[:, 0], star_positions[:, 1], c=colors, s=10, edgecolor='white', alpha=0.5)
         plt.legend({'really far away'},loc='upper right')
+    
     elif colors == 'distance':
         # Generate colors based on distance values
         colors = generate_distance_colors(table)
         print("Colors:", colors)
         print('type of colors[0]', type(colors[0]))
-        red = np.where(colors == 'red')
+        red = np.where(colors == 'red', True, False)
         print("Red stars:", red)
         print("Red stars:", star_positions[red])
-        green = np.where(colors == 'green')
+        green = np.where(colors=='green', True, False)
         blue = np.where(colors == 'blue')
         yellow = np.where(colors == 'yellow')
         
@@ -42,6 +43,23 @@ def plot_superimposed_on_image(image_file, star_positions, output_file, table = 
         ax.scatter(star_positions[blue, 0], star_positions[blue, 1], c='blue', s=10, edgecolor='white', alpha=0.5)
         ax.scatter(star_positions[yellow, 0], star_positions[yellow, 1], c='yellow', s=10, edgecolor='white', alpha=0.5)
         plt.legend(['really far away','<1500 parsecs', '<1000 parsecs', '<500 parsecs'],loc='upper right')
+        
+    elif colors == 'magnitude':
+        # Generate colors based on magnitude values
+        colors = generate_magnitude_colors(table)
+        red = np.where(colors == 'red')
+        print("Red stars:", red)
+        print("Red stars:", star_positions[red])
+        green = np.where(colors == 'green')
+        blue = np.where(colors == 'blue')
+        yellow = np.where(colors == 'yellow')
+        
+        ax.scatter(star_positions[blue, 0], star_positions[blue, 1], c='blue', s=10, edgecolor='white', alpha=0.5, label='<10')
+        ax.scatter(star_positions[green, 0], star_positions[green, 1], c='green', s=10, edgecolor='white', alpha=0.5, label = '10-15')
+        ax.scatter(star_positions[yellow, 0], star_positions[yellow, 1], c='yellow', s=10, edgecolor='white', alpha=0.5, label='15-20')
+        ax.scatter(star_positions[red, 0], star_positions[red, 1], c='red', s=10, edgecolor='white', alpha=0.5, label = '>20')
+        plt.legend(loc='upper right')
+    
     else:
         ax.scatter(star_positions[:, 0], star_positions[:, 1], c='red', s=10, edgecolor='white', alpha=0.5)
     
@@ -67,7 +85,7 @@ def generate_sigma_colors(table):
         table (astropy.table.Table): Table containing star data.
     
     Returns:
-        list: List of colors for each star based on their sigma values.
+        array: numpy array of colors for each star based on their sigma values.
     """
     distance = table['distance'].data
     
@@ -95,7 +113,7 @@ def generate_sigma_colors(table):
         else:
             colors.append('red')
     
-    return colors
+    return np.array(colors)
 
 def generate_distance_colors(table):
     """
@@ -105,7 +123,7 @@ def generate_distance_colors(table):
         table (astropy.table.Table): Table containing star data.
     
     Returns:
-        list: List of colors for each star based on their distance values.
+        array: numpy array of colors for each star based on their distance values.
     """
     distance = table['distance'].data
     
@@ -124,7 +142,37 @@ def generate_distance_colors(table):
         else:
             colors.append('red')
     
-    return colors
+    return np.array(colors)
+
+def generate_magnitude_colors(table):
+    """
+    Generate colors based on the magnitude values of the stars.
+    
+    Args:
+        table (astropy.table.Table): Table containing star data.
+    
+    Returns:
+        array: numpy array of colors for each star based on their magnitude values.
+    """
+    # Assuming the table has a 'magnitude' column
+    magnitudes = table['V_apparent'].data
+    magnitudes = magnitudes[1:]  # Skip the first value (header)
+    magnitudes = np.array(magnitudes, dtype=float)
+    
+    colors = []
+    
+    for value in magnitudes:
+        if value < 10:
+            colors.append('blue')
+        elif value < 15:
+            colors.append('green')
+        elif value < 20:
+            colors.append('yellow')
+        else:
+            colors.append('red')
+    
+    return np.array(colors)
+    
 
 
 if __name__ == "__main__":
@@ -133,7 +181,7 @@ if __name__ == "__main__":
     
     # Getting star positions by importing the Ra/Dec table and converting back into pixel (just to test and see)
     from astropy.table import Table
-    star_table = Table.read(path + '../star_matching/target_table.tex')
+    star_table = Table.read(path + '../star_matching/target_table_part2.tex')
 
     from star_positions import get_pixel_from_coords
     # Get skycoords data from the star table
@@ -160,4 +208,4 @@ if __name__ == "__main__":
     colors = generate_distance_colors(star_table)
     
     # Call the function to plot and save the image
-    plot_superimposed_on_image(image_file, star_positions, output_file, table=star_table, colors='distance')
+    plot_superimposed_on_image(image_file, star_positions, output_file, table=star_table, colors='magnitude')

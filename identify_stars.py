@@ -30,7 +30,7 @@ def get_nearby_stars(ra, dec, radius=.1):
     
     return result
 
-def identify_stars(skyvals, pixel_positions, nearby_stars):
+def identify_stars(skyvals, pixel_positions, nearby_stars, radius=0.01):
     
     """
     Identify stars in the image based on their pixel positions and sky coordinates.
@@ -52,7 +52,7 @@ def identify_stars(skyvals, pixel_positions, nearby_stars):
             
             distance = star.separation(SkyCoord(ra=known_star['ra'], dec=known_star['dec'], unit=(u.deg, u.deg)))
             #print(f"Star Selected:{star}. Distance to known star {known_star} : {distance}")
-            if distance < .01 * u.deg:
+            if distance < radius * u.deg:
                 # If it is, add it to the identified stars list
                 print(f"Identified star: {star} matches known star: \n{known_star}")
                 # Check if the known star has a parallax value
@@ -65,13 +65,14 @@ def identify_stars(skyvals, pixel_positions, nearby_stars):
                     star_distance = 1000 / known_star['plx_value'] # Parallax to distance conversion
                     print("Star Distance:", star_distance, "parsecs")
                     identified_star = {
-                    'name': known_star['main_id'],
-                    'sky_coord': star,
-                    'pixel_pos': pixel_positions[i],
-                    'distance': star_distance,
+                        'name': known_star['main_id'],
+                        'sky_coord': star,
+                        'pixel_pos': pixel_positions[i],
+                        'distance': star_distance,
                     }
                     identified_stars.append(identified_star)
                     print("Star Identified, added to list.")
+                    print("Stars Identified:", len(identified_stars))
                     break
                 else:
                     # If the known star does not have a parallax value, do not add it (we don't care about it)
@@ -85,7 +86,7 @@ if __name__ == "__main__":
     # Example usage, this is pointed at my cluster with a reasonably large radius
     ra = 101.4991667  # Example RA in degrees
     dec = -20.7161111  # Example Dec in degrees
-    radius = 0.5  # Search radius in degrees
+    radius = 0.6  # Search radius in degrees
 
     nearby_stars = get_nearby_stars(ra, dec, radius)
     print("Nearby Stars:", nearby_stars)
@@ -95,7 +96,8 @@ if __name__ == "__main__":
     skyvals = np.load(path+'../star_pos_identification/B_20s_combined_skyvals.npy', allow_pickle=True)
     
     # Identify stars from our photo that match the nearby stars in our Simbad search
-    identified_stars = identify_stars(skyvals, pixel_positions, nearby_stars)
+    # .002 degrees is about 3 pixels in the image, so we should be able to get a good match for the stuff that's in the same general spot
+    identified_stars = identify_stars(skyvals, pixel_positions, nearby_stars, radius=0.003)
     print("Identified Stars:", identified_stars)
     print("Number of identified stars:", len(identified_stars))
     
