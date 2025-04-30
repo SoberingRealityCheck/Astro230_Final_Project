@@ -146,12 +146,11 @@ def generate_pixel_to_world_matrix():
 
 def get_coords_from_pixel(star_positions, wcs):
     """
-    Convert pixel locations to RA/Dec locations using a known reference point and the FOV of the sensor.
+    Convert pixel locations to RA/Dec locations.
 
     Args:
         star_positions (Numpy array): 2d array of pixel positions of stars.
-        reference_point (tuple): Reference point (RA, Dec) in degrees.
-        fov (float): Field of view in degrees.
+        wcs (wcs object): transformation wcs object for the image.
 
     Returns:
         list: List of RA/Dec locations of stars.
