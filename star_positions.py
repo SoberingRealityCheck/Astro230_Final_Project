@@ -102,9 +102,7 @@ def generate_pixel_to_world_matrix():
     # CPD-10 1623        -- 548.93354 x, 300.96545 y, 06 46 22.70 -20 41 02.10, hrs 6.7729722 deg -20.6839166
     # TYC 5961-1468-1    -- 65.694216 x, 443.14170 y, 06 44 49.75 -20 47 40.69, hrs 6.7471527 deg -20.7946361
     
-    #found this code on stack overflow. hell yeah
-    # https://stackoverflow.com/questions/63594323/astropy-wcs-transfromation-matrix
-    
+    # These are our astronomical coordinates for each star
     stars = SkyCoord(
         ra=[6.7675500, 6.7686667, 6.7598639, 6.7840639, 6.7577778, 
             6.7524861, 6.7697944, 6.7725750, 6.7942278, 6.7686027,
@@ -115,15 +113,19 @@ def generate_pixel_to_world_matrix():
             -20.6069194, -20.5942055, -20.7829638, -20.6813694, -20.9478638,
             -21.1131333, -21.1248222, -20.7775111, -20.6839166, -20.7946361], 
         unit=(u.hourangle ,u.deg))
+    
+    # These are our pixel coordinates for each star
     pixels_x = np.array([416.42371, 467.76442, 304.3124, 755.22029, 263.55565, 
                         169.31156, 487.78894, 539.10617, 941.08451, 467.97932,
                         457.45778, 921.87055, 911.25769, 871.59616, 563.45581,
                         425.45777, 267.63457, 258.85233, 548.93354, 65.694216])
+    
     pixels_y = np.array([420.80733, 393.25411, 293.98475, 293.52529, 504.59604, 
                         18.231880, 472.04317, 529.76223, 588.20195, 276.33726,
                         197.94727, 186.20412, 436.94065, 301.78246, 651.74896,
                         870.12045, 883.33927, 422.32718, 300.96545, 443.14170])
     
+    # Check the shapes of the arrays
     print("Stars shape:", stars.shape)
     print("pixels_x shape:", pixels_x.shape)
     print("pixels_y shape:", pixels_y.shape)
@@ -134,6 +136,7 @@ def generate_pixel_to_world_matrix():
     print("wcs_world_n_dim:", pixel_to_world_wcs.world_n_dim)
     print("wcs_array_shape:", pixel_to_world_wcs.array_shape)
     
+    # Check the transform to see if running it forwards and backwards gets us close to where we started 
     print("WCS TEST")
     print("--------------------")
     print("star 1 pixel:", pixel_to_world_wcs.world_to_pixel(stars[0]))
