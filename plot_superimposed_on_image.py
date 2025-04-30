@@ -93,7 +93,7 @@ def plot_superimposed_on_image(image_file_V, image_file_B, image_file_R, star_po
         ax.set_title('Apparent V band Magnitudes of Stars Identified in our Image')
     elif colors == 'B-V':
         # Generate colors based on B-V values
-        norm = plt.Normalize(-1, 1)
+        norm = plt.Normalize(-2, 4)
         c = generate_color_colors(table)
         sc = ax.scatter(star_positions[:,0],star_positions[:,1], c=c, cmap='twilight_shifted', alpha=.75, norm=norm, marker='x', label='B-V')
         plt.colorbar(sc, label='Color Index (B-V)', orientation='vertical')
