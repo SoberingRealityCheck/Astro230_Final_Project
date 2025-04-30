@@ -73,12 +73,13 @@ def get_pixel_positions(file, threshold = 3, plot=False):
         star_positions.append([star['xcentroid'], star['ycentroid']])
     return np.array(star_positions)
 
-def generate_pixel_to_world_matrix():
+def generate_pixel_to_world_matrix_manually():
     '''
     Generate a pixel to world coordinate transformation matrix.
     '''
+    # MANUALLY LOCATED CALIBRATION STARS:
     
-    # HD 49091           -- 416.42371 x, 420.80733 y, 06 46 03.18 -20 43 18.62, hrs 6.7675500 deg -20.7218389
+    # HD 49091           -- 416.67466 x, 420.12101 y, 06 45 57.46 -20 46 30.16, hrs 6.7659611 deg -20.7750444
     # HD 49126           -- 467.76442 x, 393.25411 y, 06 46 07.20 -20 45 15.55, hrs 6.7686667 deg -20.7543194
     # HD 49023           -- 304.31240 x, 293.98475 y, 06 45 35.51 -20 40 51.38, hrs 6.7598639 deg -20.6809389 
     # HD 49317           -- 755.22029 x, 293.52529 y, 06:47:02.63 -20:40:32.82, hrs 6.7840639 deg -20.6757833
@@ -104,27 +105,27 @@ def generate_pixel_to_world_matrix():
     
     # These are our astronomical coordinates for each star
     stars = SkyCoord(
-        ra=[6.7675500, 6.7686667, 6.7598639, 6.7840639, 6.7577778, 
+        ra=[6.7659611, 6.7686667, 6.7598639, 6.7840639, 6.7577778, 
             6.7524861, 6.7697944, 6.7725750, 6.7942278, 6.7686027,
             6.7680111, 6.7928833, 6.7925249, 6.7902861, 6.7739638,
             6.7666888, 6.7582083, 6.7574833, 6.7729722, 6.7471527], 
-        dec=[-20.7218389, -20.7543194, -20.6809389, -20.6757833, -20.8397222, 
+        dec=[-20.7750444, -20.7543194, -20.6809389, -20.6757833, -20.8397222, 
             -20.4748056, -20.8131083, -20.8561972, -20.8959722, -20.6519361,
             -20.6069194, -20.5942055, -20.7829638, -20.6813694, -20.9478638,
             -21.1131333, -21.1248222, -20.7775111, -20.6839166, -20.7946361], 
         unit=(u.hourangle ,u.deg))
     
     # These are our pixel coordinates for each star
-    pixels_x = np.array([416.42371, 467.76442, 304.3124, 755.22029, 263.55565, 
+    pixels_x = np.array([416.67466, 467.76442, 304.3124, 755.22029, 263.55565, 
                         169.31156, 487.78894, 539.10617, 941.08451, 467.97932,
                         457.45778, 921.87055, 911.25769, 871.59616, 563.45581,
                         425.45777, 267.63457, 258.85233, 548.93354, 65.694216])
     
-    pixels_y = np.array([420.80733, 393.25411, 293.98475, 293.52529, 504.59604, 
+    pixels_y = np.array([420.12101, 393.25411, 293.98475, 293.52529, 504.59604, 
                         18.231880, 472.04317, 529.76223, 588.20195, 276.33726,
                         197.94727, 186.20412, 436.94065, 301.78246, 651.74896,
                         870.12045, 883.33927, 422.32718, 300.96545, 443.14170])
-    
+
     # Check the shapes of the arrays
     print("Stars shape:", stars.shape)
     print("pixels_x shape:", pixels_x.shape)
@@ -143,6 +144,46 @@ def generate_pixel_to_world_matrix():
     print("star 1 actual pixel:", pixels_x[0], pixels_y[0])
     print("")
     return pixel_to_world_wcs
+
+def generate_pixel_to_world_matrix():
+    '''
+    Generate a pixel to world coordinate transformation matrix... 
+    ...using our astrometry.net configurations we found online.
+    
+    yeah, so the other thing wasn't working :D
+    
+    Output from astropy.net:
+    Created TanWCS: <TanWCS: 
+    CRVAL (101.620297, -20.877072) 
+    CRPIX (577.846779, 557.950546) 
+    CD (0.000753, 0.000009; 0.000009 -0.000753) 
+    Image size (1017.000000, 1018.000000)>
+    2025-04-30 05:00:52,073 
+    SkyLocation: <SkyLocation: nside(128) healpix(87821)>
+    '''
+    
+    
+    wcs1 = WCS(naxis=2)
+    wcs1.wcs.crpix = [577.846779, 557.950546]  # Reference pixel
+    wcs1.wcs.cd = np.array([[0.000753, 0.000009], [0.000009, -0.000753]])  # Pixel scale in degrees/pixel
+    wcs1.wcs.crval = [101.620297, -20.877072]  # Reference coordinate (RA, Dec) in degrees
+    wcs1.wcs.ctype = ['RA---TAN', 'DEC--TAN']  # Coordinate type
+    wcs1.wcs.cunit = ['deg', 'deg']  # Units of the coordinates
+    
+    print("wcs", wcs1)
+    print("wcs_pixel_n_dim:", wcs1.pixel_n_dim)
+    print("wcs_world_n_dim:", wcs1.world_n_dim)
+    print("wcs_array_shape:", wcs1.array_shape)
+    
+    # Check the transform to see if running it forwards and backwards gets us close to where we started 
+    print("WCS TEST")
+    print("--------------------")
+    print("star 1 pixel:", wcs1.world_to_pixel(SkyCoord(ra=6.7659611, dec=-20.7750444, unit=(u.hourangle, u.deg))))
+    print("star 1 actual pixel:", 416.67466, 420.12101)
+    print("")
+    print
+    
+    return wcs1
 
 def get_coords_from_pixel(star_positions, wcs):
     """
@@ -176,7 +217,7 @@ def get_pixel_from_coords(skyvals):
     Returns:
         list: List of pixel locations of stars.
     """
-    wcs = generate_pixel_to_world_matrix()
+    wcs = generate_pixel_to_world_matrix_manually()
     pixel_positions = []
     for skyval in skyvals:
         pixel_pos_new = (skycoord_to_pixel(skyval, wcs, origin=0))
@@ -198,7 +239,7 @@ if __name__ == "__main__":
         print("Processing file:", file)
         pixel_positions = get_pixel_positions(file, threshold=50, plot=PLOT_PIXEL)
         print("Pixel Positions of Stars:", pixel_positions)
-        pixel_to_world_wcs = generate_pixel_to_world_matrix()
+        pixel_to_world_wcs = generate_pixel_to_world_matrix_manually()
         skyvals = get_coords_from_pixel(pixel_positions, pixel_to_world_wcs)
         if PLOT_WCS:
             for i in range(len(skyvals)):

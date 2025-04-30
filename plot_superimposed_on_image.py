@@ -25,6 +25,7 @@ def plot_superimposed_on_image(image_file, star_positions, output_file, table = 
         colors = generate_sigma_colors(table)
         ax.scatter(star_positions[:, 0], star_positions[:, 1], c=colors, s=10, edgecolor='white', alpha=0.5)
         plt.legend({'really far away'},loc='upper right')
+        ax.set_title('Sigma of Stars Identified in our Image')
     
     elif colors == 'distance':
         # Generate colors based on distance values
@@ -43,6 +44,7 @@ def plot_superimposed_on_image(image_file, star_positions, output_file, table = 
         ax.scatter(star_positions[blue, 0], star_positions[blue, 1], c='blue', s=10, edgecolor='white', alpha=0.5)
         ax.scatter(star_positions[yellow, 0], star_positions[yellow, 1], c='yellow', s=10, edgecolor='white', alpha=0.5)
         plt.legend(['really far away','<1500 parsecs', '<1000 parsecs', '<500 parsecs'],loc='upper right')
+        ax.set_title('Distances of Stars Identified in our Image')
         
     elif colors == 'magnitude':
         # Generate colors based on magnitude values
@@ -59,12 +61,14 @@ def plot_superimposed_on_image(image_file, star_positions, output_file, table = 
         ax.scatter(star_positions[yellow, 0], star_positions[yellow, 1], c='yellow', s=10, edgecolor='white', alpha=0.5, label='15-20')
         ax.scatter(star_positions[red, 0], star_positions[red, 1], c='red', s=10, edgecolor='white', alpha=0.5, label = '>20')
         plt.legend(loc='upper right')
+        ax.set_title('Magnitudes of Stars Identified in our Image')
     
     else:
+        ax.set_title('Stars Identified in our Image')
         ax.scatter(star_positions[:, 0], star_positions[:, 1], c='red', s=10, edgecolor='white', alpha=0.5)
     
     # Set the title and labels
-    ax.set_title('Stars Identified in our Image')
+    
     ax.set_xlabel('X Pixel')
     ax.set_ylabel('Y Pixel')
     
