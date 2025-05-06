@@ -44,16 +44,22 @@ def get_pixel_positions(file, threshold = 3, plot=False):
     print("Star Locations Found:", star_locations)
     # Step 2.5(optional): Plot the images with detected stars for visual verification
     if plot:
+        num_stars = len(star_locations)
         # Get the nice looking filename for the plot title
         filename = file.split('/')[-1]
         filename = filename.split('\\')[1]
         
         # Also define a nice logarithmic scale for our images
-        from matplotlib.colors import LogNorm
-        log_norm = LogNorm(vmin=10, vmax = np.max(image))
+        from matplotlib.colors import SymLogNorm, LogNorm
+        median_sky_value = np.nanmedian(image[0])
+        max_star_value = np.nanmax(image[0])
+        print("Max Star Value:", max_star_value)
+        print("Median Sky Value:", median_sky_value)
         
-        plt.style.use('dark_background')
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 10))
+        log_norm = SymLogNorm(linthresh=10, linscale=1, vmin=median_sky_value, vmax = max_star_value)
+        
+        plt.style.use('bmh')
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
         ax1.imshow(image, cmap='gray', origin='lower', norm=log_norm)
         ax1.set_title(f'Original Image: \n {filename}')
         ax1.set_xlabel('X Pixel')
@@ -61,11 +67,16 @@ def get_pixel_positions(file, threshold = 3, plot=False):
         
         ax2.imshow(image, cmap='gray', origin='lower', norm=log_norm)
         ax2.scatter(star_locations['xcentroid'], star_locations['ycentroid'], s=1, color='red')
-        ax2.set_title(f'Detected Stars, threshold={threshold}, fwhm={fwhm}')
+        ax2.set_title(f'{num_stars} Detected Stars, threshold={threshold}, fwhm={fwhm}')
         ax2.set_xlabel('X Pixel')
         ax2.set_ylabel('Y Pixel')
         
-        plt.show()
+        file_id = filename.split('.')[0]
+        plt.savefig(path + f'../star_pos_identification/media/{file_id}_detected_stars_light.png', dpi=300)
+        
+        # delete the figure to free up memory
+        plt.close(fig)
+        #plt.show()
     
     # Step 3: Return the pixel positions of the stars
     star_positions = []
@@ -242,14 +253,16 @@ if __name__ == "__main__":
         pixel_to_world_wcs = generate_pixel_to_world_matrix_manually()
         skyvals = get_coords_from_pixel(pixel_positions, pixel_to_world_wcs)
         if PLOT_WCS:
+            plt.style.use('bmh')
             for i in range(len(skyvals)):
                 plt.scatter(skyvals[i].ra, skyvals[i].dec, s=1, color='red')
             plt.xlabel('RA (degrees)')
             plt.ylabel('Dec (degrees)')
             plt.title('Star Locations in RA/Dec')
-            plt.show()
-            plt.xlim(103,105)
-            plt.ylim(-21,-19)
+            #plt.show()
+            #plt.xlim(103,105)
+            #plt.ylim(-21,-19)
+            plt.savefig(path + f'../star_pos_identification/media/{file_id}_skyvals_light.png', dpi=300)
         # Save the pixel positions to a numpy file
         np.save(path + f'../star_pos_identification/{file_id}_pixel_positions.npy', pixel_positions)
         np.save(path + f'../star_pos_identification/{file_id}_skyvals.npy', skyvals)
