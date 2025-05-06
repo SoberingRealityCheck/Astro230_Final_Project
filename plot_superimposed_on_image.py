@@ -297,7 +297,7 @@ if __name__ == "__main__":
     from astropy.table import Table
     star_table = Table.read(path + '../star_matching/target_table_part4.tex')
 
-    from star_positions import get_pixel_from_coords
+    from step3_star_positions import get_pixel_from_coords
     # Get skycoords data from the star table
     sky_coords = star_table["sky_coord"].data[1:]
     
