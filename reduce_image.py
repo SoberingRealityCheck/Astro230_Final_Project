@@ -151,22 +151,22 @@ def reduce_image(ffile, biases, flats, darks, ranges, debug=False, use_darks=Tru
     if crop_data:
         nheader['BIASSEC'] = "["+str(bx1)+":"+str(bx2)+","+str(y1)+":"+str(y2)+"]"
         nheader['TRIMSEC'] = "["+str(x1)+":"+str(x2)+","+str(y1)+":"+str(y2)+"]"
-
     #return the reduced data and header
-    return ndata_no_bias, nheader
+    return ndata_ff, nheader
 
 if __name__ == "__main__":
+    
+    from config import path
     # Test the function
-    path = "C:/Users/buzzs/OneDrive/Documents/Physics/Astro 230/SpectroLab/"
-    test_ffile = fits.open(path + "data/raw/mars_Object_7s_20250225_213833-1.fit")
-    test_biases = glob.glob(path + 'data/calibration/biases/*.fit')
-    test_flats = glob.glob(path + 'data/calibration/flats/*.fit')
-    test_darks = glob.glob(path + 'data/calibration/darks/*.fit')
+    test_ffile = fits.open(path + "raw/obj0016.fits")
+    test_biases = glob.glob(path + 'calibration/biases/*.fits')
+    test_flats = glob.glob(path + 'calibration/flats/*.fits')
+    test_darks = glob.glob(path + 'calibration/darks/*.fits')
 
-    DEBUG = False
+    DEBUG = True
     # Set to True to see debug information and plots
     
-    DARKS = True
+    DARKS = False
     # Set to True to use dark frames in the reduction process
     
     CROP_DATA = False

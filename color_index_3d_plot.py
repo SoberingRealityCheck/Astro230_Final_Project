@@ -64,7 +64,7 @@ def plot_3d_scatter(x, y, z, color, title, xlabel, ylabel, zlabel):
         xlabel (str): Label for the X-axis.
         ylabel (str): Label for the Y-axis.
         zlabel (str): Label for the Z-axis.
-    """
+    """ 
     # Some cool styling for the plot
     plt.style.use('dark_background')
     plt.rcParams['grid.color'] = (0.5, 0.5, 0.5, 0)
@@ -74,8 +74,8 @@ def plot_3d_scatter(x, y, z, color, title, xlabel, ylabel, zlabel):
     ax.set_box_aspect([1,1,1])  # Aspect ratio is 1:1:1
     
     # Get the color range so it properly makes white stars at B-V = 1
-    norm = plt.Normalize(-1, 1)
-    sc = ax.scatter(x, y, z, c=color, cmap='bwr', alpha=.9, norm=norm)
+    norm = plt.Normalize(-1, 3)
+    sc = ax.scatter(x, y, z, c=color, cmap='twilight_ebushifted', alpha=.9, norm=norm)
     
     #ax.scatter(0, 0, 0, marker='o', color='yellow', s=10)  # Our Sun is at the origin
     

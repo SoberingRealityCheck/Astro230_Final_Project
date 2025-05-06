@@ -63,5 +63,7 @@ if __name__ == "__main__":
     # Get the absolute magnitude table
     abs_mag_table = get_abs_mag_table(target_table)
     
+    print("Shape of Table:", abs_mag_table.info())
+    
     # Save the absolute magnitude table to a file
     abs_mag_table.write(path + '../star_matching/target_table_part3.tex', format='latex', overwrite=True)

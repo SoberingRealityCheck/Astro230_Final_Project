@@ -12,9 +12,24 @@ def add_sigma_values(table):
     Returns:
         astropy.table.Table: Updated table with sigma values.
     """
+    # Extract the distances from the table
+    distance = table['distance'].data
+    distance = np.array(distance, dtype=float)
+    
     # Create a normal distribution for the distances
-    mu = np.nanmedian(table['distance'].data[1:])
-    std = np.nanstd(table['distance'].data[1:])
+    center_estimate = np.nanmedian(distance)
+    cluster_distance = []
+    
+    arbitrary_limit = 300  # Arbitrary limit to crop out the crazy outliers
+    
+    for i in range(len(distance)):
+        if distance[i] < center_estimate + arbitrary_limit and distance[i] > center_estimate - arbitrary_limit:
+            cluster_distance.append(distance[i])
+    
+    # Some fun with getting a gaussian fit to our distance data to see where our cluster probably is
+    mu = np.nanmedian(cluster_distance)
+    std = np.nanstd(cluster_distance)
+
     print("Mu:", mu, "Std:", std)
     
     # Create a new column for sigma values
@@ -24,6 +39,7 @@ def add_sigma_values(table):
     for i in range(len(table)):
         if table['distance'][i] > 0:
             table['sigma'][i] = (table['distance'][i] - mu) / std
+            print("Distance:", table['distance'][i], "Sigma:", table['sigma'][i])
         else:
             table['sigma'][i] = np.nan
     

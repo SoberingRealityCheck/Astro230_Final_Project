@@ -25,18 +25,22 @@ def extract_star_positions(table):
     # Crop out the crazy outliers from the data. Stuff that is farther than 10000 parsecs is probably not in our cluster
     print("Distance before cropping", distance)
     
+    center_estimate = np.nanmedian(distance)
+    cluster_distance = []
+    
+    arbitrary_limit = 300  # Arbitrary limit to crop out the crazy outliers
     
     for i in range(len(distance)):
-        if distance[i] > 4000:
-            distance[i] = np.nan
+        if distance[i] < center_estimate + arbitrary_limit and distance[i] > center_estimate - arbitrary_limit:
+            cluster_distance.append(distance[i])
     
     # Some fun with getting a gaussian fit to our distance data to see where our cluster probably is
-    mu = np.nanmedian(distance)
-    std = np.nanstd(distance)
+    mu = np.nanmedian(cluster_distance)
+    std = np.nanstd(cluster_distance)
     xp = np.linspace(0, 4000, 100)
-    p = norm.pdf(xp, mu, std) * 100000
+    p = norm.pdf(xp, mu, std) * 50000
     print("P", p)
-    plt.style.use('dark_background')
+    plt.style.use('bmh')
     plt.plot(xp, p, linewidth=2)
     title = "Fit results: mu = %.2f,  std = %.2f" % (mu, std)
     plt.xlabel('Radial Distance (parsecs)')
@@ -44,6 +48,7 @@ def extract_star_positions(table):
     plt.title(title)
     plt.hist(distance, bins=100)
     plt.legend(['Gaussian Fit', 'Data'])
+    plt.savefig(path + '../analysis/Distance-Histogram_light.png', dpi=300, bbox_inches='tight')
     plt.show()
     
     # Our median distance is 739.64 parsecs and our standard deviation is 904.92 parsecs.
@@ -107,6 +112,7 @@ def extract_star_positions(table):
     plt.xlabel('Radial Distance from Cluster Center (parsecs)')
     plt.ylabel('Star Density')
     plt.title('Star Density vs Radial Distance from Cluster Center')
+    plt.savefig(path + '../Radial Distance Histogram.png', dpi=300, bbox_inches='tight')
     plt.show()
     
 
@@ -119,7 +125,7 @@ print("Star Positions (3D):", star_positions)
 print("Median Star Position:", np.nanmedian(star_positions, axis=0))
 
 # Dark mode plots because hell yeah
-with plt.style.context('dark_background'):
+with plt.style.context('bmh'):
     # Set the colormap to 'Spectral' for better visibility and also coolness
     plt.set_cmap('Spectral')
     plt.rcParams['grid.color'] = (0.5, 0.5, 0.5, 0)
@@ -132,6 +138,11 @@ with plt.style.context('dark_background'):
     ax.set_ylabel('Y-axis (parsecs)')
     ax.set_zlabel('Z-axis (parsecs)')
     ax.set_title('3D Plot of Star Positions')
+    
+    # Plot the cluster center
+    cluster_members = star_positions[np.where(star_positions[:, 3] < 1)]
+    cluster_center = np.nanmedian(cluster_members, axis=0)
+    ax.scatter(cluster_center[0], cluster_center[1], cluster_center[2], marker='x', color='cyan', s=20)  # Cluster center
     
     # Scatter plot of star positions
     ax.scatter(star_positions[:, 0], star_positions[:, 1], star_positions[:, 2], marker='o', c = star_positions[:, 3], s=.1, alpha=1)

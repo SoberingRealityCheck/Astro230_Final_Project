@@ -19,11 +19,12 @@ abs_B = np.array(abs_B, dtype=float)
 # Cool dark background
 plt.style.use('dark_background')
 
+
 # Define a color based on the star's sigma value from the cluster
 color = target_table['sigma'].data[1:]
 
 # Create a scatter plot CMD
-plt.scatter(abs_B - abs_V, abs_V, label='B-V', alpha=0.5, c=color)
+plt.scatter(abs_B - abs_V, abs_V, label='Stars', alpha=0.5, c=color)
 #plt.scatter(abs_V - abs_R, abs_V, label='V-R', alpha=0.5)
 
 # Add labels and title
@@ -33,12 +34,12 @@ plt.title('Color-Magnitude Diagram (CMD)')
 plt.legend()
 
 plt.colorbar(label='Sigma Value', orientation='vertical')
-plt.clim(-.1, .1)  # Set color limits for sigma values
+plt.clim(-1, 1)  # Set color limits for sigma values
 
 plt.ylim(10,-5)  # Inverted y-axis for CMD
 
 # Save the plot to a file
-plt.savefig(path + '../CMD.png', dpi=300, bbox_inches='tight')
+plt.savefig(path + '../hr_fitting/CMD_dark.png', dpi=300, bbox_inches='tight')
 
 # Show the plot
 plt.show()

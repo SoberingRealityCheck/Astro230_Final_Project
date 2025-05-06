@@ -226,8 +226,8 @@ def get_pixel_from_coords(skyvals):
 
 if __name__ == "__main__":
     # Example usage
-    PLOT_PIXEL = False
-    PLOT_WCS = False
+    PLOT_PIXEL = True
+    PLOT_WCS = True
     
     files = fits_get(path + 'combined/')
     print("Files to be processed:", files)

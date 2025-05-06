@@ -17,7 +17,7 @@ abs_R = np.array(abs_R, dtype=float)
 abs_B = np.array(abs_B, dtype=float)
 
 # Cool dark background
-plt.style.use('dark_background')
+plt.style.use('bmh')
 
 # Create a scatter plot CMD
 plt.scatter(abs_B - abs_V, abs_V - abs_R, label='B-V vs V-R', alpha=0.5)
@@ -30,7 +30,7 @@ plt.title('Color-Color Diagram')
 plt.legend()
 
 # Save the plot to a file
-plt.savefig(path + '../Color-Color_Diagram.png', dpi=300, bbox_inches='tight')
+plt.savefig(path + '../Color-Color_Diagram_light.png', dpi=300, bbox_inches='tight')
 
 # Show the plot
 plt.show()
